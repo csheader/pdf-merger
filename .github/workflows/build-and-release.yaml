@@ -29,6 +29,8 @@ jobs:
           pip install pytest pytest-mock
 
       - name: Run tests
+        env:
+          PYTHONPATH: src
         run: pytest tests/
 
   build:
