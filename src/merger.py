@@ -1,6 +1,6 @@
 import os
 import argparse
-from PyPDF2 import PdfMerger, PdfReader
+from pypdf import PdfMerger, PdfReader
 
 def process_pdf(pdf_file, input_dir, prefix_pages, postfix_pages, output_dir):
     """
@@ -51,8 +51,8 @@ def process_pdfs(input_dir, prefix_file, postfix_file, output_dir, num_threads):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     pdf_files = [f for f in os.listdir(input_dir) if f.lower().endswith('.pdf')]
-    prefix_pages = prefix_file if prefix_file else None
-    postfix_pages = postfix_file if postfix_file else None
+    prefix_pages = PdfReader(prefix_file) if prefix_file else None
+    postfix_pages = PdfReader(postfix_file) if postfix_file else None
     from concurrent.futures import ThreadPoolExecutor
     with ThreadPoolExecutor(max_workers=num_threads) as executor:
         for pdf_file in pdf_files:

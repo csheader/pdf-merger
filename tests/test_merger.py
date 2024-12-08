@@ -8,7 +8,11 @@ from src.merger import process_pdf, process_pdfs
 @pytest.fixture
 def mock_pdf_merger(mocker):
     mock_merger = mocker.patch('src.merger.PdfMerger', autospec=True)
-    return mock_merger
+    mock_instance = mock_merger.return_value
+    mock_instance.append = MagicMock()
+    mock_instance.write = MagicMock()
+    mock_instance.close = MagicMock()
+    return mock_instance
 
 def test_process_pdf(mock_pdf_merger, tmp_path):
     pdf_file = "test.pdf"
@@ -20,11 +24,11 @@ def test_process_pdf(mock_pdf_merger, tmp_path):
     prefix_pages = MagicMock()
     postfix_pages = MagicMock()
     process_pdf(pdf_file, str(input_dir), prefix_pages, postfix_pages, str(output_dir))
-    mock_pdf_merger.return_value.append.assert_any_call(prefix_pages)
-    mock_pdf_merger.return_value.append.assert_any_call(str(input_dir / pdf_file))
-    mock_pdf_merger.return_value.append.assert_any_call(postfix_pages)
-    mock_pdf_merger.return_value.write.assert_called_once_with(str(output_dir / pdf_file))
-    mock_pdf_merger.return_value.close.assert_called_once()
+    mock_pdf_merger.append.assert_any_call(prefix_pages)
+    mock_pdf_merger.append.assert_any_call(str(input_dir / pdf_file))
+    mock_pdf_merger.append.assert_any_call(postfix_pages)
+    mock_pdf_merger.write.assert_called_once_with(str(output_dir / pdf_file))
+    mock_pdf_merger.close.assert_called_once()
 
 def test_process_pdfs(mocker, tmp_path):
     input_dir = tmp_path / "input"
