@@ -1,0 +1,82 @@
+name: Build, Test, and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-mock
+
+      - name: Run tests
+        run: pytest tests/
+
+  build:
+    runs-on: ${{ matrix.os }}
+    needs: test
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install pyinstaller
+
+      - name: Build executable
+        run: |
+          if [[ "$RUNNER_OS" == "Linux" ]]; then pyinstaller --onefile --name pdf_tool_linux src/merger.py; fi
+          if [[ "$RUNNER_OS" == "macOS" ]]; then pyinstaller --onefile --name pdf_tool_mac src/merger.py; fi
+          if [[ "$RUNNER_OS" == "Windows" ]]; then pyinstaller --onefile --name pdf_tool_win src/merger.py; fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: pdf_tool_${{ matrix.os }}
+          path: dist/
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts/
+
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          artifacts: |
+            dist/pdf_tool_linux
+            dist/pdf_tool_mac
+            dist/pdf_tool_win.exe
