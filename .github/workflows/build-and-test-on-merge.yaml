@@ -60,7 +60,7 @@ jobs:
         run: pyinstaller --onefile --name pdf_tool_win src/merger.py
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: pdf_tool_${{ matrix.os }}
           path: dist/ 
