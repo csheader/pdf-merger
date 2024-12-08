@@ -1,16 +1,9 @@
-name: Build, Test, and Release
+name: Build and Test on Merge to Main
 
 on:
   push:
-    tags:
-      - 'v*'
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-  release:
-    types: [created]
 
 jobs:
   test:
@@ -70,29 +63,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: pdf_tool_${{ matrix.os }}
-          path: dist/
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: pdf_tool_${{ matrix.os }}
-          path: dist/
-
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          path: artifacts/
-
-      - name: Create release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
-          artifacts: |
-            dist/pdf_tool_linux
-            dist/pdf_tool_mac
-            dist/pdf_tool_win.exe
+          path: dist/ 
