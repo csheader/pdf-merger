@@ -54,11 +54,23 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Build executable
-        run: |
-          if [[ "$RUNNER_OS" == "Linux" ]]; then pyinstaller --onefile --name pdf_tool_linux src/merger.py; fi
-          if [[ "$RUNNER_OS" == "macOS" ]]; then pyinstaller --onefile --name pdf_tool_mac src/merger.py; fi
-          if [[ "$RUNNER_OS" == "Windows" ]]; then pyinstaller --onefile --name pdf_tool_win src/merger.py; fi
+      - name: Build executable on Linux
+        if: runner.os == 'Linux'
+        run: pyinstaller --onefile --name pdf_tool_linux src/merger.py
+
+      - name: Build executable on macOS
+        if: runner.os == 'macOS'
+        run: pyinstaller --onefile --name pdf_tool_mac src/merger.py
+
+      - name: Build executable on Windows
+        if: runner.os == 'Windows'
+        run: pyinstaller --onefile --name pdf_tool_win src/merger.py
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: pdf_tool_${{ matrix.os }}
+          path: dist/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
