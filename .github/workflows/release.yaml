@@ -28,5 +28,5 @@ jobs:
             dist/pdf_tool_linux
             dist/pdf_tool_mac
             dist/pdf_tool_win.exe 
-          env:
-            GITHUB_TOKEN: ${{ secrets.REPO_PUBLISH }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_PUBLISH }}
