@@ -20,13 +20,13 @@ jobs:
           path: artifacts/
 
       - name: Create release
-        uses: ncipollo/release-action@v1.14.0
-            
+        uses: softprops/action-gh-release@v1
         with:
-          token: ${{ secrets.REPO_PUBLISH }}
           tag: ${{ github.event.release.tag_name }}
           name: Release ${{ github.ref_name }}
-          artifacts: |
+          files: |
             dist/pdf_tool_linux
             dist/pdf_tool_mac
             dist/pdf_tool_win.exe 
+          env:
+            GITHUB_TOKEN: ${{ secrets.REPO_PUBLISH }}
